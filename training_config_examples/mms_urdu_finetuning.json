@@ -1,0 +1,57 @@
+{
+    "project_name": "mms_urdu_test_run",
+    "push_to_hub": true,
+    "hub_model_id": "hamza-amin/mms-tts-urd-train",
+    "report_to": ["tensorboard"],
+    "overwrite_output_dir": true,
+    "overwrite_cache": true,
+    "output_dir": "./tmp/vits_urdu_test",
+
+    "dataset_name": "muhammadsaadgondal/urdu-tts",
+    "dataset_config_name": null,
+    "audio_column_name": "audio",
+    "text_column_name": "text",
+    "train_split_name": "train",
+    "eval_split_name": "train",
+
+    "full_generation_sample_text": "یہ اردو متن سے آواز بنانے کا ایک تجربہ ہے۔",
+
+    "max_duration_in_seconds": 20.0,
+    "min_duration_in_seconds": 1.0,
+    "max_tokens_length": 500,
+
+    "model_name_or_path": "facebook/mms-tts-urd-script_arabic",
+    "override_vocabulary_embeddings": true,
+
+    "preprocessing_num_workers": 4,
+
+    "do_train": true,
+    "num_train_epochs": 50,
+    "gradient_accumulation_steps": 1,
+    "gradient_checkpointing": false,
+    "per_device_train_batch_size": 16,
+    "learning_rate": 1e-5,
+    "adam_beta1": 0.8,
+    "adam_beta2": 0.99,
+    "warmup_ratio": 0.01,
+    "group_by_length": false,
+
+    "do_eval": true,
+    "eval_steps": 200,
+    "per_device_eval_batch_size": 8,
+    "max_eval_samples": 25,
+    "do_step_schedule_per_epoch": true,
+
+    "weight_disc": 5.0,
+    "weight_fmaps": 1.0,
+    "weight_gen": 1.0,
+    "weight_kl": 2.0,
+    "weight_duration": 1.0,
+    "weight_mel": 45.0,
+
+    "fp16": false,
+    "bf16": true,
+    "seed": 456,
+    "logging_dir": "logs",
+    "uroman_path": "/home/alivijdaan/urdu-tts/uroman"
+}
