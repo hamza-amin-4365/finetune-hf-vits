@@ -39,6 +39,9 @@ def convert_checkpoint(
         generator_checkpoint_path = f"facebook/mms-tts-{language_code}"
     
     config = VitsConfig.from_pretrained(generator_checkpoint_path)
+    # 🔧 FIX: MMS configs do not define pad_token_id
+    if not hasattr(config, "pad_token_id") or config.pad_token_id is None:
+        config.pad_token_id = 0
     generator = VitsModel.from_pretrained(generator_checkpoint_path)
 
     discriminator = VitsDiscriminator(config)
