@@ -1,3 +1,9 @@
+#user defined
+tmp/
+cmds_tts.txt
+mm-urd-train
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
