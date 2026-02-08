@@ -1,7 +1,29 @@
-transformers>=4.35.1
-datasets[audio]>=2.14.7
-accelerate>=0.24.1
+# Base Frameworks
+torch>=2.1.0
+torchaudio>=2.1.0
+torchvision
+
+# Hugging Face Suite
+transformers>=4.40.0
+accelerate>=0.28.0
+datasets>=2.18.0
+tokenizers>=0.19.0
+evaluate
+
+# Audio Processing
+scipy
+numpy<2.0.0
+librosa
+soundfile
 matplotlib
-wandb
+
+# VITS Specific & Alignment
+cython
+monotonic-alignment-search>=0.2.0
+phonemizer
+unidecode
+
+# Training Utilities
+tqdm
 tensorboard
-Cython
+wandb
