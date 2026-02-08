@@ -33,7 +33,7 @@ from transformers.feature_extraction_utils import BatchFeature
 from transformers.optimization import get_scheduler
 from transformers.trainer_pt_utils import LengthGroupedSampler
 from transformers.trainer_utils import get_last_checkpoint, is_main_process
-from transformers.utils import send_example_telemetry
+# from transformers.utils import send_example_telemetry
 from utils import plot_alignment_to_numpy, plot_spectrogram_to_numpy, VitsDiscriminator, VitsModelForPreTraining, VitsFeatureExtractor, slice_segments, VitsConfig, uromanize
 
 
@@ -531,13 +531,13 @@ def main():
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
-        model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+        model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]), allow_extra_keys=True)
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
-    send_example_telemetry("run_vits_finetuning", model_args, data_args)
+    # send_example_telemetry("run_vits_finetuning", model_args, data_args)
 
     # 2. Setup logging
     logging.basicConfig(
@@ -568,7 +568,7 @@ def main():
 
     # 3. Detecting last checkpoint and eventually continue from last checkpoint
     last_checkpoint = None
-    if os.path.isdir(training_args.output_dir) and training_args.do_train and not training_args.overwrite_output_dir:
+    if os.path.isdir(training_args.output_dir) and training_args.do_train and not getattr(training_args, "overwrite_output_dir", False):
         last_checkpoint = get_last_checkpoint(training_args.output_dir)
         if last_checkpoint is None and len(os.listdir(training_args.output_dir)) > 0:
             raise ValueError(
@@ -641,12 +641,14 @@ def main():
         trust_remote_code=model_args.trust_remote_code,
     )
 
-    feature_extractor = VitsFeatureExtractor.from_pretrained(
-        model_args.feature_extractor_name if model_args.feature_extractor_name else model_args.model_name_or_path,
-        cache_dir=model_args.cache_dir,
-        revision=model_args.model_revision,
-        token=model_args.token,
-        trust_remote_code=model_args.trust_remote_code,
+    feature_extractor = VitsFeatureExtractor(
+        feature_size=80,       # number of mel channels
+        sampling_rate=22050,   # audio sample rate
+        hop_size=256,          # hop length
+        win_size=1024,         # FFT window size
+        fft_size=1024,         # FFT size
+        min_level_db=-100,
+        ref_level_db=20,
     )
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
@@ -797,6 +799,10 @@ def main():
         logger.info(f"Data preprocessing finished. Files cached at {cache}.")
         return
 
+    config.pad_token_id = tokenizer.pad_token_id
+    # If tokenizer doesn't have one, use the default VITS pad ID (usually 0)
+    if config.pad_token_id is None:
+        config.pad_token_id = 0
     # 8. Load pretrained model,
     # Distributed training:
     # The .from_pretrained methods guarantee that only one local process can concurrently

@@ -1866,7 +1866,9 @@ class VitsDiscriminator(VitsPreTrainedModel):
                 for period in config.discriminator_periods
             ]
         )
-
+    @property
+    def all_tied_weights_keys(self):
+        return {}
     def forward(self, hidden_states):
         fmaps = []
         discriminated_hidden_states_list = []
